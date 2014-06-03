@@ -8,9 +8,12 @@
 #include "Mc.h"
 #include <cmath>
 
-Mc::Mc() {
+Mc::Mc(int seed) {
 	// TODO Auto-generated constructor stub
-	startRandomGenerator(0);
+	startRandomGenerator(seed);
+	_BReal=0.3;
+	_BIm=0.7;
+	_lambda=0;
 
 }
 
@@ -62,14 +65,13 @@ int Mc::calculateMagnetization(vector<double> &magnetization){
 	return exitcode;
 }
 
-double P(double realv, double imv){
+double Mc::calculateP(double realv, double imv){
 	double lambda=0.;
-	double BReal=0.3;
-	double BIm=0.7;
-	return exp(2*(BReal*realv+BIm*imv)-(pow(realv,2)+pow(imv,2))-lambda*pow(pow(realv,2)+pow(imv,2)-1,2));
+	double phisquare=pow(realv,2)+pow(imv,2);
+	return exp(2*(_BReal*realv+_BIm*imv)-(phisquare-lambda*pow(phisquare-1,2)));
 }
 
-int Mc::createNewConfiguration(double delta, double hitsPerPoint, double &acceptance){
+int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance){
 	int exitcode=1;
 	int numAccepts=0;
 	int numHits=0;
@@ -83,8 +85,8 @@ int Mc::createNewConfiguration(double delta, double hitsPerPoint, double &accept
     rReal = getRandomUni()*delta*2-delta;
     rIm = getRandomUni()*delta*2-delta;
     rAccept = getRandomUni();
-    p = P(_fieldReal.at(0),_fieldIm.at(0));
-    pnew=P(_fieldReal.at(0)+rReal,_fieldIm.at(0)+rIm);
+    p = calculateP(_fieldReal.at(0),_fieldIm.at(0));
+    pnew=calculateP(_fieldReal.at(0)+rReal,_fieldIm.at(0)+rIm);
 //	cout << "p " << p << endl;
 
 	if ((pnew>p)||(pnew/p>rAccept)){
@@ -96,7 +98,6 @@ int Mc::createNewConfiguration(double delta, double hitsPerPoint, double &accept
     }
 
 	acceptance=(double)numAccepts/numHits;
-	cout << "acceptance " << acceptance << endl;
 	return exitcode;
 }
 

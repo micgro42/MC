@@ -21,8 +21,14 @@ using namespace std;
 
 class Mc {
 public:
-	Mc();
+	Mc(int seed);
 	virtual ~Mc();
+
+	void setBreal(double breal){_BReal=breal;}
+	void setBIm(double bim){_BIm=bim;}
+	void setLambda(double lambdaIn){_lambda=lambdaIn;}
+	void setKappa(double kappaIn){_kappa=kappaIn;}
+
 	double getRandomUni();
 	void startRandomGenerator (double seed);
 	int setFields(const vector<double> &fieldReal, const vector<double> &fieldIm);
@@ -34,8 +40,10 @@ public:
 	 */
 	int calculateMagnetization(vector<double> &magnetization);
 
+	double calculateP(double realv, double imv);
 
-	int createNewConfiguration(double delta, double hitsPerPoint, double &acceptance);
+
+	int createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance);
 
 private:
 
@@ -44,6 +52,20 @@ private:
 
 	///imaginary part of the field
 	vector<double> _fieldIm;
+
+	///real part of a value used for test with 1-point fields
+	double _BReal;
+
+	///real part of a value used for test with 1-point fields
+	double _BIm;
+
+	/// @brief interpolation between Gaussian model and XY-model
+	///
+	/// @ can be between 0 and +infinity
+	double _lambda;
+
+	/// coupling of neighbours
+	double _kappa;
 
 	///random generator
 	default_random_engine _randGenerator;
