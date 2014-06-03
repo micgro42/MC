@@ -70,7 +70,7 @@ BOOST_FIXTURE_TEST_CASE( Magnetization1PointLambda0, F1Point ){
     BOOST_REQUIRE(exitcode==0);
     BOOST_CHECK_CLOSE( results.at(0) , BReal ,tol*100);
     BOOST_CHECK_CLOSE( results.at(1) , BIm ,tol*100);
-    BOOST_CHECK_CLOSE( results.at(2) , BReal*BReal+BIm*BIm ,tol*100);
+    BOOST_CHECK_CLOSE( results.at(2) , 1+BReal*BReal+BIm*BIm ,tol*100);
 }
 
 BOOST_FIXTURE_TEST_CASE( Magnetization1PointLambda4, F1Point ){
@@ -91,7 +91,7 @@ BOOST_FIXTURE_TEST_CASE( Magnetization1PointLambda4, F1Point ){
     exitcode=testMc.calculateMeanMagnetization(steps, delta, results);
     BOOST_REQUIRE(exitcode==0);
     BOOST_CHECK_CLOSE( results.at(0)+2*testMc.getLambda()*results.at(3) , BReal ,tol*100);
-    BOOST_CHECK_CLOSE( results.at(1)+2*testMc.getLambda()*results.at(4) , BReal ,tol*100);
+    BOOST_CHECK_CLOSE( results.at(1)+2*testMc.getLambda()*results.at(4) , BIm ,tol*100);
 }
 
 BOOST_AUTO_TEST_SUITE_END( )
