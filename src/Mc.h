@@ -22,12 +22,17 @@ using namespace std;
 class Mc {
 public:
 	Mc(int seed);
+	Mc();
 	virtual ~Mc();
 
-	void setBreal(double breal){_BReal=breal;}
+	void setBReal(double breal){_BReal=breal;}
 	void setBIm(double bim){_BIm=bim;}
 	void setLambda(double lambdaIn){_lambda=lambdaIn;}
 	void setKappa(double kappaIn){_kappa=kappaIn;}
+
+	double getBReal(){return _BReal;}
+	double getBIm(){return _BIm;}
+	double getLambda(){return _lambda;}
 
 	double getRandomUni();
 	void startRandomGenerator (double seed);
@@ -43,7 +48,9 @@ public:
 	double calculateP(double realv, double imv);
 
 
-	int createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance);
+	int createNewConfiguration(const double delta, const double hitsPerPoint, double & acceptance);
+	int thermalizeField(double &delta);
+	int calculateMeanMagnetization(int steps, const double delta, vector<double> & results);
 
 private:
 

@@ -17,6 +17,15 @@ Mc::Mc(int seed) {
 
 }
 
+Mc::Mc() {
+	// TODO Auto-generated constructor stub
+	startRandomGenerator(0);
+	_BReal=0.3;
+	_BIm=0.7;
+	_lambda=0;
+
+}
+
 Mc::~Mc() {
 	// TODO Auto-generated destructor stub
 }
@@ -66,9 +75,8 @@ int Mc::calculateMagnetization(vector<double> &magnetization){
 }
 
 double Mc::calculateP(double realv, double imv){
-	double lambda=0.;
 	double phisquare=pow(realv,2)+pow(imv,2);
-	return exp(2*(_BReal*realv+_BIm*imv)-(phisquare-lambda*pow(phisquare-1,2)));
+	return exp(2*(_BReal*realv+_BIm*imv)-phisquare-_lambda*pow(phisquare-1,2));
 }
 
 int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance){
@@ -102,6 +110,78 @@ int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, do
 }
 
 
+int Mc::thermalizeField(double & delta){
+	double acceptance;
+	double meanAcceptance=0;
+	int iterthermal=0;
+	int deltaNotChanged=0;
+	bool deltaChanged;
+	int thermalStep=100;
+	while (deltaNotChanged<10){
+		deltaChanged=false;
+		meanAcceptance=0;
+		for (int i=0; i<thermalStep; ++i){
+			createNewConfiguration(delta, 10, acceptance);
+			meanAcceptance+=acceptance;
+		}
+		meanAcceptance=meanAcceptance/(double)thermalStep;
+		if (0.3>meanAcceptance){
+			delta=delta*0.95;
+			deltaChanged=true;
+		}
+		if (meanAcceptance>0.5){
+			delta=delta*1.05;
+			deltaChanged=true;
+		}
+		if (deltaChanged){
+			deltaNotChanged=0;
+		}else{
+			++deltaNotChanged;
+		}
+		iterthermal+=thermalStep;
+		cout << "mean Acceptance: " << meanAcceptance << " delta " << delta << endl;
+		if (iterthermal>100*thermalStep){
+			deltaNotChanged=20;
+		}
+	}
+	cout << "delta: " << delta << " after " << iterthermal << " steps" << endl;
+	return 0;
+}
+
+/**
+ * @param[out] results Component 0: Real part of the mean magnetisation
+ * Component 1: Imaginary part of the mean magnetisation
+ * Component 2: mean squared absolute magnetisation
+ * Component 3: real part of foo
+ * Component 4: imaginary part of foo
+ */
+int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double> & results){
+	results.assign(5,0);
+	double meanMagReal=0;
+	double meanMagIm=0;
+	double meansqrabsMag=0;
+	double fooReal=0;
+	double fooIm=0;
+	double acceptance;
+	vector<double> magnetization;
+
+	for (int i=0; i<steps; ++i){
+		createNewConfiguration(delta, 10, acceptance);
+		calculateMagnetization(magnetization);
+		meanMagReal+=magnetization.at(0);
+		meanMagIm+=magnetization.at(1);
+		double absmagsquare=magnetization.at(0)*magnetization.at(0)+magnetization.at(1)*magnetization.at(1);
+		meansqrabsMag+=absmagsquare;
+		fooReal+=magnetization.at(0)*(absmagsquare-1);
+		fooIm+=magnetization.at(1)*(absmagsquare-1);
+	}
+	results.at(0)=meanMagReal/steps;
+	results.at(1)=meanMagIm/steps;
+	results.at(2)=meansqrabsMag/steps;
+	results.at(3)=fooReal/steps;
+	results.at(4)=fooIm/steps;
+	return 0;
+}
 
 
 

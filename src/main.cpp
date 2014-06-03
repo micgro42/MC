@@ -23,55 +23,19 @@ int main(int argc, char** argv){
 	cout << "Real part: " << magnetization.at(0) << "; Imaginary part: " << magnetization.at(1) << endl;
 
 
-	double meanAcceptance=acceptance;
-	int iterthermal=0;
-	int deltaNotChanged=0;
-	bool deltaChanged;
-	int thermalStep=100;
-	while (deltaNotChanged<10){
-		deltaChanged=false;
-		meanAcceptance=0;
-		for (int i=0; i<thermalStep; ++i){
-			test.createNewConfiguration(delta, 10, acceptance);
-			meanAcceptance+=acceptance;
-		}
-		meanAcceptance=meanAcceptance/(double)thermalStep;
-		if (0.3>meanAcceptance){
-			delta=delta*0.95;
-			deltaChanged=true;
-		}
-		if (meanAcceptance>0.5){
-			delta=delta*1.05;
-			deltaChanged=true;
-		}
-		if (deltaChanged){
-			deltaNotChanged=0;
-		}else{
-			++deltaNotChanged;
-		}
-		iterthermal+=thermalStep;
-		cout << "mean Acceptance: " << meanAcceptance << " delta " << delta << endl;
-		if (iterthermal>100*thermalStep){
-			deltaNotChanged=20;
-		}
-	}
-	cout << "delta: " << delta << " after " << iterthermal << " steps" << endl;
-
-	double meanMagReal=0;
-	double meanMagIm=0;
-	double meansqrabsMag=0;
+	test.setLambda(4);
+	test.thermalizeField(delta);
 	int steps = 1000000;
-	for (int i=0; i<steps; ++i){
-		test.createNewConfiguration(delta, 10, acceptance);
-		test.calculateMagnetization(magnetization);
-		meanMagReal+=magnetization.at(0);
-		meanMagIm+=magnetization.at(1);
-		meansqrabsMag+=magnetization.at(0)*magnetization.at(0)+magnetization.at(1)*magnetization.at(1);
-	}
+	vector<double> results;
+	test.calculateMeanMagnetization(steps, delta, results);
 
-	cout << "mean real component: " << meanMagReal/steps << endl;
-	cout << "mean imaginary component: " << meanMagIm/steps << endl;
-	cout << "absolute magnetization squared " << meansqrabsMag/steps << endl;
+
+	cout << "mean real component: " << results.at(0) << endl;
+	cout << "mean imaginary component: " << results.at(1) << endl;
+	cout << "mean absolute magnetization squared is " << results.at(2) << " and should be " << 1+test.getBReal()*test.getBReal()+test.getBIm()*test.getBIm() << endl;
+
+	cout << results.at(0)+2*test.getLambda()*results.at(3) << endl;
+	cout << results.at(1)+2*test.getLambda()*results.at(4) << endl;
 
 	cout << "calculateMagnetization exitcode: " << test.calculateMagnetization(magnetization) << endl;
 	cout << "Real part: " << magnetization.at(0) << "; Imaginary part: " << magnetization.at(1) << endl;

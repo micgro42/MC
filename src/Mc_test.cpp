@@ -24,3 +24,30 @@
  *
  *
  */
+
+
+
+namespace logging = boost::log;
+
+struct F1Point {
+
+//     F() : i( 0 ) { std::cout << "setup" << std::endl; }
+	F1Point(){
+    	cout << endl;
+        logging::core::get()->set_filter (logging::trivial::severity >= logging::trivial::info);
+    }
+    ~F1Point()          {  }
+
+    Mc testMc;
+
+};
+
+
+/*
+BOOST_AUTO_TEST_SUITE (Mc_test)
+
+
+BOOST_FIXTURE_TEST_CASE( matrixVectorLaplace_m0, F1Point ){
+
+}
+*/
