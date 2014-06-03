@@ -109,7 +109,7 @@ int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, do
 	return exitcode;
 }
 
-
+///@todo check/make sure that fields are initialised 
 int Mc::thermalizeField(double & delta){
 	double acceptance;
 	double meanAcceptance=0;
@@ -139,12 +139,10 @@ int Mc::thermalizeField(double & delta){
 			++deltaNotChanged;
 		}
 		iterthermal+=thermalStep;
-		cout << "mean Acceptance: " << meanAcceptance << " delta " << delta << endl;
 		if (iterthermal>100*thermalStep){
 			deltaNotChanged=20;
 		}
 	}
-	cout << "delta: " << delta << " after " << iterthermal << " steps" << endl;
 	return 0;
 }
 
