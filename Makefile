@@ -23,8 +23,8 @@ debug: CFLAGS += $(DBGCFLAGS)
 debug: OUTDIR = $(DBGDIR)
 debug: all
 
-main: Mc.o main.o
-	$(CC) $(LDFLAGS) Mc.o main.o $(LDLIBS) -o main
+main: Mc.o stat5.o main.o
+	$(CC) $(LDFLAGS) stat5.o Mc.o main.o $(LDLIBS) -o main
 
 Mc.o: $(SRCDIR)Mc.cpp $(SRCDIR)Mc.h
 	$(CC) $(CFLAGS) -c $(SRCDIR)Mc.cpp
@@ -32,8 +32,8 @@ Mc.o: $(SRCDIR)Mc.cpp $(SRCDIR)Mc.h
 main.o: $(SRCDIR)main.cpp 
 	$(CC) $(CFLAGS) -c $(SRCDIR)main.cpp
 	
-unittest: Mc_test.o Mc.o
-	$(CC) $(LDFLAGS) Mc.o Mc_test.o $(LDLIBS) -o unittest
+unittest: Mc_test.o  stat5.o  Mc.o
+	$(CC) $(LDFLAGS) stat5.o Mc.o Mc_test.o $(LDLIBS) -o unittest
 
 Mc_test.o: $(SRCDIR)Mc_test.cpp Mc.o
 	$(CC) $(CFLAGS) -c $(SRCDIR)Mc_test.cpp

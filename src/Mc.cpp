@@ -7,6 +7,7 @@
 
 #include "Mc.h"
 #include <cmath>
+#include "stat5.h"
 
 Mc::Mc(int seed) {
 	// TODO Auto-generated constructor stub
@@ -56,6 +57,8 @@ int Mc::setFields(const vector<double> &fieldReal, const vector<double> &fieldIm
 	}
 	return exitcode;
 }
+
+
 
 int Mc::calculateMagnetization(vector<double> &magnetization){
 	int exitcode=1;
@@ -152,9 +155,13 @@ int Mc::thermalizeField(double & delta){
  * Component 2: mean squared absolute magnetisation
  * Component 3: real part of foo
  * Component 4: imaginary part of foo
+ *
+ *
+ * @details foo \f$ =\left< \Phi \left( \left|\Phi\right|^2 -1 \right) \right> \f$
  */
 int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double> & results){
 	results.assign(5,0);
+	clear5(10,500);
 	double meanMagReal=0;
 	double meanMagIm=0;
 	double meansqrabsMag=0;
@@ -169,6 +176,9 @@ int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double>
 		meanMagReal+=magnetization.at(0);
 		meanMagIm+=magnetization.at(1);
 		double absmagsquare=magnetization.at(0)*magnetization.at(0)+magnetization.at(1)*magnetization.at(1);
+		accum5(1,magnetization.at(0));
+		accum5(2,magnetization.at(1));
+		accum5(3,absmagsquare);
 		meansqrabsMag+=absmagsquare;
 		fooReal+=magnetization.at(0)*(absmagsquare-1);
 		fooIm+=magnetization.at(1)*(absmagsquare-1);
@@ -178,6 +188,21 @@ int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double>
 	results.at(2)=meansqrabsMag/steps;
 	results.at(3)=fooReal/steps;
 	results.at(4)=fooIm/steps;
+	cout << "_BReal: " << _BReal << endl;
+	cout << "_BIm: " << _BIm << endl;
+	cout << "1+|B|^2: " << 1+_BReal*_BReal+_BIm*_BIm << endl;
+	cout << "stat5: mean Re(magnetization) " << aver5(1) << " +- " << sigma5(1) << endl;
+	cout << "stat5: mean Im(magnetization) " << aver5(2) << " +- " << sigma5(2) << endl;
+	cout << "stat5: mean abs(magnetization) " << aver5(3) << " +- " << sigma5(3) << endl;
+
+
+	cout << "stat5: covar5 Re, Im " << covar5(1,2) << endl;
+	cout << "stat5: tau5 Re(magnetization) " << tau5(1) << endl;
+	cout << "stat5: tau5 Im(magnetization) " << tau5(2) << endl;
+	cout << "stat5: tauint5 Re(magnetization) " << tauint5(1) << endl;
+	cout << "stat5: tauint5 Im(magnetization) " << tauint5(2) << endl;
+
+
 	return 0;
 }
 

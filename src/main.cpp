@@ -33,9 +33,9 @@ int main(int argc, char** argv){
 	cout << "mean real component: " << results.at(0) << endl;
 	cout << "mean imaginary component: " << results.at(1) << endl;
 	cout << "mean absolute magnetization squared is " << results.at(2) << " and should be " << 1+test.getBReal()*test.getBReal()+test.getBIm()*test.getBIm() << endl;
-
-	cout << results.at(0)+2*test.getLambda()*results.at(3) << endl;
-	cout << results.at(1)+2*test.getLambda()*results.at(4) << endl;
+	cout << "if lambda is nonzero:" << endl;
+	cout << results.at(0)+2*test.getLambda()*results.at(3) << " should be " << test.getBReal() << endl;
+	cout << results.at(1)+2*test.getLambda()*results.at(4) << " should be " << test.getBIm() << endl;
 
 	cout << "calculateMagnetization exitcode: " << test.calculateMagnetization(magnetization) << endl;
 	cout << "Real part: " << magnetization.at(0) << "; Imaginary part: " << magnetization.at(1) << endl;

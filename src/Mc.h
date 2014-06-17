@@ -38,7 +38,7 @@ public:
 	void startRandomGenerator (double seed);
 	int setFields(const vector<double> &fieldReal, const vector<double> &fieldIm);
 
-	/** @brief calculates the magnetization per configuration and in the thermodynamic mean
+	/** @brief calculates the magnetization of the entire field, does not change the field
 	 *
 	 * @param[out] magnetization the first component is the real part, the second component is the imaginary part
 	 * @return 0 if everything went well,
@@ -47,9 +47,32 @@ public:
 
 	double calculateP(double realv, double imv);
 
-
+	/**
+	 * @brief creates a new configuration of the field with hitsPerPoint tried steps per point
+	 *
+	 *
+	 *
+	 *
+	 */
 	int createNewConfiguration(const double delta, const double hitsPerPoint, double & acceptance);
+
+
+	/**
+	 * @brief thermalizes the field
+	 *
+	 *
+	 */
 	int thermalizeField(double &delta);
+
+
+
+	/**
+	 * @brief creates steps new configurations
+	 *
+	 *
+	 *
+	 *
+	 */
 	int calculateMeanMagnetization(int steps, const double delta, vector<double> & results);
 
 private:
