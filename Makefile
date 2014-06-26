@@ -1,6 +1,7 @@
 ### Compile settings
 CC=g++
 CXXWARNINGS=-Wall -Wextra -pedantic #-Wshadow -Wlogical-op
+CXXREPORTS= -ftree-vectorizer-verbose0
 CFLAGS= -Ofast -fopenmp -std=c++11 $(CXXWARNINGS) -DBOOST_ALL_DYN_LINK -I/users/stud/micgro42/boost/include/
 
 ### Linker settings
@@ -17,7 +18,7 @@ RELCFLAGS = -DNDEBUG
 
 SRCDIR=src/
 
-all: unittest main
+all: main #unittest
 
 debug: CFLAGS += $(DBGCFLAGS)
 debug: OUTDIR = $(DBGDIR)

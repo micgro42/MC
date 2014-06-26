@@ -12,6 +12,7 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include "global.h"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ public:
 	 */
 	int calculateMagnetization(vector<double> &magnetization);
 
-	double calculateP(double realv, double imv);
+	double calculateP(int position, double realv, double imv);
 
 	/**
 	 * @brief creates a new configuration of the field with hitsPerPoint tried steps per point
@@ -88,6 +89,12 @@ private:
 
 	///real part of a value used for test with 1-point fields
 	double _BIm;
+
+	///real component of the external field
+	double _hReal;
+
+	///imaginary component of the external field
+	double _hIm;
 
 	/// @brief interpolation between Gaussian model and XY-model
 	///

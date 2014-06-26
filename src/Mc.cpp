@@ -14,7 +14,10 @@ Mc::Mc(int seed) {
 	startRandomGenerator(seed);
 	_BReal=0.3;
 	_BIm=0.7;
-	_lambda=0;
+	_lambda=4;
+	_kappa=0.5;
+	_hReal=0.3;
+	_hIm=0;
 
 }
 
@@ -23,7 +26,10 @@ Mc::Mc() {
 	startRandomGenerator(0);
 	_BReal=0.3;
 	_BIm=0.7;
-	_lambda=0;
+	_lambda=4;
+	_kappa=0.5;
+	_hReal=0.3;
+	_hIm=0;
 
 }
 
@@ -64,7 +70,7 @@ int Mc::calculateMagnetization(vector<double> &magnetization){
 	int exitcode=1;
 	if (_fieldReal.size()!=0){
 		magnetization.assign(2,0);
-		for (int i=0;i<_fieldReal.size();++i){
+		for (unsigned int i=0;i<_fieldReal.size();++i){
 			magnetization.at(0)+=_fieldReal.at(i);
 			magnetization.at(1)+=_fieldIm.at(i);
 		}
@@ -77,9 +83,18 @@ int Mc::calculateMagnetization(vector<double> &magnetization){
 	return exitcode;
 }
 
-double Mc::calculateP(double realv, double imv){
+///see equation 4.13 and 4.14
+double Mc::calculateP(int position, double realv, double imv){
+	double BReal=0;
+	double BIm=0;
+	for (int i=1;i<=ndim;++i){
+		BReal+=_fieldReal.at(nn[i][position])+_fieldReal.at(nn[i+ndim][position]);
+		BIm+=_fieldIm.at(nn[i][position])+_fieldIm.at(nn[i+ndim][position]);
+	}
+	BReal=_hReal+_kappa*BReal;
+	BIm=_hIm+_kappa*BIm;
 	double phisquare=pow(realv,2)+pow(imv,2);
-	return exp(2*(_BReal*realv+_BIm*imv)-phisquare-_lambda*pow(phisquare-1,2));
+	return exp(2*(BReal*realv+BIm*imv)-phisquare-_lambda*pow(phisquare-1,2));
 }
 
 int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance){
@@ -89,24 +104,25 @@ int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, do
 	double rReal;
 	double rIm;
 	double rAccept;
-    double p;
-    double pnew;
+	double p;
+	double pnew;
+	for (int i=0; i<nvol;++i){
+		for (int j=0;j<hitsPerPoint;++j){
+			rReal = getRandomUni()*delta*2-delta;
+			rIm = getRandomUni()*delta*2-delta;
+			rAccept = getRandomUni();
+			p = calculateP(i,_fieldReal.at(i),_fieldIm.at(i));
+			pnew=calculateP(i,_fieldReal.at(i)+rReal,_fieldIm.at(i)+rIm);
+//			cout << "i " << i << "; j " << j << "; p " << p << endl;
 
-    for (int i=0;i<hitsPerPoint;++i){
-    rReal = getRandomUni()*delta*2-delta;
-    rIm = getRandomUni()*delta*2-delta;
-    rAccept = getRandomUni();
-    p = calculateP(_fieldReal.at(0),_fieldIm.at(0));
-    pnew=calculateP(_fieldReal.at(0)+rReal,_fieldIm.at(0)+rIm);
-//	cout << "p " << p << endl;
-
-	if ((pnew>p)||(pnew/p>rAccept)){
-		_fieldReal.at(0)=_fieldReal.at(0)+rReal;
-		_fieldIm.at(0)=_fieldIm.at(0)+rIm;
-		++numAccepts;
+			if ((pnew>p)||(pnew/p>rAccept)){
+				_fieldReal.at(i)=_fieldReal.at(i)+rReal;
+				_fieldIm.at(i)=_fieldIm.at(i)+rIm;
+				++numAccepts;
+			}
+			++numHits;
+		}
 	}
-	++numHits;
-    }
 
 	acceptance=(double)numAccepts/numHits;
 	return exitcode;

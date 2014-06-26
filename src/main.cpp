@@ -1,6 +1,10 @@
 #include<vector>
 #include<iostream>
 #include"Mc.h"
+#define DEFINE_GLOBAL
+#include "geom_pbc.c"
+
+
 int main(int argc, char** argv){
 	int seed;
 	if (argc > 1){
@@ -8,10 +12,25 @@ int main(int argc, char** argv){
 	}else{
 		seed=time(NULL);
 	}
+
+	ndim=2;//atoi(argv[4]);
+	int steps=6;//atoi(argv[2]);
+	lsize = (int *) malloc((ndim+1) * sizeof(int));
+	for (int i=1; i<=ndim; ++i){
+		lsize[i]=steps;
+	}
+	geom_pbc();
+	cout << "nvol " << nvol << endl;
+
 	Mc test(seed);
-	vector<double> fieldReal,fieldIm,magnetization;
-	fieldReal.push_back(0.5);
-	fieldIm.push_back(0.5);
+	vector<double> fieldReal,fieldIm;
+    for (int i=1;i<=nvol;++i){
+    	fieldReal.push_back(test.getRandomUni());
+    	fieldIm.push_back(test.getRandomUni());
+    }
+
+	vector<double> magnetization;
+
 	double delta=0.5;
 	cout << "set field exitcode: " << test.setFields(fieldReal,fieldIm) << endl;
 	cout << "calculateMagnetization exitcode: " << test.calculateMagnetization(magnetization) << endl;
@@ -25,9 +44,9 @@ int main(int argc, char** argv){
 
 	test.setLambda(4);
 	test.thermalizeField(delta);
-	int steps = 1000000;
+	int numUpdates = 100000;//0;
 	vector<double> results;
-	test.calculateMeanMagnetization(steps, delta, results);
+	test.calculateMeanMagnetization(numUpdates, delta, results);
 
 
 	cout << "mean real component: " << results.at(0) << endl;
@@ -40,5 +59,7 @@ int main(int argc, char** argv){
 	cout << "calculateMagnetization exitcode: " << test.calculateMagnetization(magnetization) << endl;
 	cout << "Real part: " << magnetization.at(0) << "; Imaginary part: " << magnetization.at(1) << endl;
 
+
+	free(lsize);
 	return 0;
 }
