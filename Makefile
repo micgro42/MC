@@ -43,6 +43,8 @@ geom_pbc.o: $(SRCDIR)geom_pbc.c $(SRCDIR)global.h
 	 
 stat5.o: $(SRCDIR)stat5.c $(SRCDIR)stat5.h
 	$(CC) $(CFLAGS) -c $(SRCDIR)stat5.c
+	
+external: geom_pbc.o stat5.o
 
 clean:
 	rm -f *.o main unittest

@@ -68,7 +68,7 @@ BOOST_FIXTURE_TEST_CASE( Magnetization1PointLambda0, F1Point ){
     exitcode=1;
     exitcode=testMc.calculateMeanMagnetization(steps, delta, results);
     BOOST_REQUIRE(exitcode==0);
-    BOOST_CHECK_CLOSE( results.at(0) , BReal ,tol*100);
+    BOOST_CHECK_CLOSE( results.at(0) , BReal ,tol*100);//last variable is tolerance in percent
     BOOST_CHECK_CLOSE( results.at(1) , BIm ,tol*100);
     BOOST_CHECK_CLOSE( results.at(2) , 1+BReal*BReal+BIm*BIm ,tol*100);
 }
