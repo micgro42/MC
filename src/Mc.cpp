@@ -166,17 +166,21 @@ int Mc::thermalizeField(double & delta){
 }
 
 /**
- * @param[out] results Component 0: Real part of the mean magnetisation
- * Component 1: Imaginary part of the mean magnetisation
- * Component 2: mean squared absolute magnetisation
- * Component 3: real part of foo
- * Component 4: imaginary part of foo
+ * @param[out] results
+ * Component 0: Real part of the mean magnetisation <br>
+ * Component 1: the error of the real part of the mean magnetisation <br>
+ * Component 2: Imaginary part of the mean magnetisation <br>
+ * Component 3: the error of the imaginary part of the mean magnetisation <br>
+ * Component 4: mean squared absolute magnetisation <br>
+ * Component 5: the error of the mean squared absolute magnetisation <br>
+ * Component 6: real part of foo <br>
+ * Component 7: imaginary part of foo
  *
  *
  * @details foo \f$ =\left< \Phi \left( \left|\Phi\right|^2 -1 \right) \right> \f$
  */
 int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double> & results){
-	results.assign(5,0);
+	results.assign(8,0);
 	clear5(10,500);
 	double meanMagReal=0;
 	double meanMagIm=0;
@@ -199,11 +203,14 @@ int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double>
 		fooReal+=magnetization.at(0)*(absmagsquare-1);
 		fooIm+=magnetization.at(1)*(absmagsquare-1);
 	}
-	results.at(0)=meanMagReal/steps;
-	results.at(1)=meanMagIm/steps;
-	results.at(2)=meansqrabsMag/steps;
-	results.at(3)=fooReal/steps;
-	results.at(4)=fooIm/steps;
+	results.at(0)=aver5(1);
+	results.at(1)=sigma5(1);
+	results.at(2)=aver5(2);
+	results.at(3)=sigma5(2);
+	results.at(4)=aver5(3);
+	results.at(5)=sigma5(3);
+	results.at(6)=fooReal/steps;
+	results.at(7)=fooIm/steps;
 	cout << "_BReal: " << _BReal << endl;
 	cout << "_BIm: " << _BIm << endl;
 	cout << "1+|B|^2: " << 1+_BReal*_BReal+_BIm*_BIm << endl;
