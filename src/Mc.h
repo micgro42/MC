@@ -26,14 +26,27 @@ public:
 	Mc();
 	virtual ~Mc();
 
-	void setBReal(double breal){_BReal=breal;}
-	void setBIm(double bim){_BIm=bim;}
 	void setLambda(double lambdaIn){_lambda=lambdaIn;}
 	void setKappa(double kappaIn){_kappa=kappaIn;}
+	void setHReal(double hRealIn){_hReal=hRealIn;}
+	void setHIm(double hImIn){_hIm=hImIn;}
+	void setDelta(double delta){_delta=delta;}
 
-	double getBReal(){return _BReal;}
-	double getBIm(){return _BIm;}
 	double getLambda(){return _lambda;}
+	double getKappa(){return _kappa;}
+	double getHReal(){return _hReal;}
+	double getHIm(){return _hIm;}
+	double getDelta(){return _delta;}
+	double getMeanRealMagnetisation(){return _meanRealMagnetisation;}
+	double getMeanRealMagnetisationError(){return _meanRealMagnetisationError;}
+	double getMeanImMagnetisation(){return _meanImMagnetisation;}
+	double getMeanImMagnetisationError(){return _meanImMagnetisationError;}
+	double getMeanSquareAbsMagnetisation(){return _meanSquareAbsMagnetisation;}
+	double getMeanSquareAbsMagnetisationError(){return _meanSquareAbsMagnetisationError;}
+
+
+
+
 
 	double getRandomUni();
 	void startRandomGenerator (double seed);
@@ -55,7 +68,7 @@ public:
 	 *
 	 *
 	 */
-	int createNewConfiguration(const double delta, const double hitsPerPoint, double & acceptance);
+	int createNewConfiguration(const double hitsPerPoint, double & acceptance);
 
 
 	/**
@@ -63,7 +76,7 @@ public:
 	 *
 	 *
 	 */
-	int thermalizeField(double &delta);
+	int thermalizeField();
 
 
 
@@ -74,7 +87,7 @@ public:
 	 *
 	 *
 	 */
-	int calculateMeanMagnetization(int steps, const double delta, vector<double> & results);
+	int calculateMeanMagnetization(int steps, vector<double> & results);
 
 private:
 
@@ -84,11 +97,8 @@ private:
 	///imaginary part of the field
 	vector<double> _fieldIm;
 
-	///real part of a value used for test with 1-point fields
-	double _BReal;
-
-	///real part of a value used for test with 1-point fields
-	double _BIm;
+	///step size for new configuration
+	double _delta;
 
 	///real component of the external field
 	double _hReal;
@@ -103,6 +113,20 @@ private:
 
 	/// coupling of neighbours
 	double _kappa;
+
+	double _meanRealMagnetisation;
+	double _meanRealMagnetisationError;
+	double _meanImMagnetisation;
+	double _meanImMagnetisationError;
+
+	/**
+	 *
+	 * magnetization.at(0)*magnetization.at(0)+magnetization.at(1)*magnetization.at(1)
+	 *
+	 * \f$ \left<\left|\phi_x\right|^2\right> = \left<\left|M\right|^2\right> = Re(M)^2 + Im(M)^2\f$
+	 */
+	double _meanSquareAbsMagnetisation;
+	double _meanSquareAbsMagnetisationError;
 
 	///random generator
 	default_random_engine _randGenerator;

@@ -12,24 +12,22 @@
 Mc::Mc(int seed) {
 	// TODO Auto-generated constructor stub
 	startRandomGenerator(seed);
-	_BReal=0.3;
-	_BIm=0.7;
 	_lambda=4;
 	_kappa=0.5;
 	_hReal=0.3;
 	_hIm=0;
+	_delta=0.5;
 
 }
 
 Mc::Mc() {
 	// TODO Auto-generated constructor stub
 	startRandomGenerator(0);
-	_BReal=0.3;
-	_BIm=0.7;
 	_lambda=4;
 	_kappa=0.5;
 	_hReal=0.3;
 	_hIm=0;
+	_delta=0.5;
 
 }
 
@@ -97,10 +95,11 @@ double Mc::calculateP(int position, double realv, double imv){
 	return exp(2*(BReal*realv+BIm*imv)-phisquare-_lambda*pow(phisquare-1,2));
 }
 
-int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, double &acceptance){
+int Mc::createNewConfiguration(const double hitsPerPoint, double &acceptance){
 	int exitcode=1;
 	int numAccepts=0;
 	int numHits=0;
+	const double delta=getDelta();
 	double rReal;
 	double rIm;
 	double rAccept;
@@ -129,9 +128,10 @@ int Mc::createNewConfiguration(const double delta, const double hitsPerPoint, do
 }
 
 ///@todo check/make sure that fields are initialised 
-int Mc::thermalizeField(double & delta){
+int Mc::thermalizeField(){
 	double acceptance;
 	double meanAcceptance=0;
+	double delta=getDelta();
 	int iterthermal=0;
 	int deltaNotChanged=0;
 	bool deltaChanged;
@@ -140,17 +140,20 @@ int Mc::thermalizeField(double & delta){
 		deltaChanged=false;
 		meanAcceptance=0;
 		for (int i=0; i<thermalStep; ++i){
-			createNewConfiguration(delta, 10, acceptance);
+			createNewConfiguration(10, acceptance);
 			meanAcceptance+=acceptance;
 		}
 		meanAcceptance=meanAcceptance/(double)thermalStep;
 		if (0.3>meanAcceptance){
-			delta=delta*0.95;
+			setDelta(delta*0.95);
+			delta=getDelta();
 			deltaChanged=true;
 		}
 		if (meanAcceptance>0.5){
-			delta=delta*1.05;
+			setDelta(delta*1.05);
+			delta=getDelta();
 			deltaChanged=true;
+
 		}
 		if (deltaChanged){
 			deltaNotChanged=0;
@@ -179,7 +182,7 @@ int Mc::thermalizeField(double & delta){
  *
  * @details foo \f$ =\left< \Phi \left( \left|\Phi\right|^2 -1 \right) \right> \f$
  */
-int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double> & results){
+int Mc::calculateMeanMagnetization(int steps, vector<double> & results){
 	results.assign(8,0);
 	clear5(10,500);
 	double meanMagReal=0;
@@ -191,7 +194,7 @@ int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double>
 	vector<double> magnetization;
 
 	for (int i=0; i<steps; ++i){
-		createNewConfiguration(delta, 10, acceptance);
+		createNewConfiguration(10, acceptance);
 		calculateMagnetization(magnetization);
 		meanMagReal+=magnetization.at(0);
 		meanMagIm+=magnetization.at(1);
@@ -203,17 +206,14 @@ int Mc::calculateMeanMagnetization(int steps, const double delta, vector<double>
 		fooReal+=magnetization.at(0)*(absmagsquare-1);
 		fooIm+=magnetization.at(1)*(absmagsquare-1);
 	}
-	results.at(0)=aver5(1);
-	results.at(1)=sigma5(1);
-	results.at(2)=aver5(2);
-	results.at(3)=sigma5(2);
-	results.at(4)=aver5(3);
-	results.at(5)=sigma5(3);
+	_meanRealMagnetisation=aver5(1);
+	_meanRealMagnetisationError=sigma5(1);
+	_meanImMagnetisation=aver5(2);
+	_meanImMagnetisationError=sigma5(2);
+	_meanSquareAbsMagnetisation=aver5(3);
+	_meanSquareAbsMagnetisationError=sigma5(3);
 	results.at(6)=fooReal/steps;
 	results.at(7)=fooIm/steps;
-	cout << "_BReal: " << _BReal << endl;
-	cout << "_BIm: " << _BIm << endl;
-	cout << "1+|B|^2: " << 1+_BReal*_BReal+_BIm*_BIm << endl;
 	cout << "stat5: mean Re(magnetization) " << aver5(1) << " +- " << sigma5(1) << endl;
 	cout << "stat5: mean Im(magnetization) " << aver5(2) << " +- " << sigma5(2) << endl;
 	cout << "stat5: mean abs(magnetization) " << aver5(3) << " +- " << sigma5(3) << endl;
